@@ -1,0 +1,15 @@
+* text=auto
+*.txt text eol=lf
+*.sh text eol=lf
+*.java text eol=lf
+*.kts text eol=lf
+*.php text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf

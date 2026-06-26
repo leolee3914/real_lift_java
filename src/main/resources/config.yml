@@ -1,0 +1,6 @@
+---
+multiple_floors_mode: true
+enable3x3: true
+enable5x5: false
+tp_entity: true
+...

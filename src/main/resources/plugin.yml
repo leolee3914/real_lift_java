@@ -1,0 +1,8 @@
+name: real_lift
+version: '${version}'
+
+main: leolee3914.real_lift.RealLiftMain
+api-version: '26.1.2'
+load: POSTWORLD
+
+author: leolee3914
