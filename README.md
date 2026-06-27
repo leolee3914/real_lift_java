@@ -2,6 +2,8 @@
 
 A more realistic elevator/lift plugin for PaperMC.
 
+PHP version for PocketMine-MP server: [https://github.com/leolee3914/real_lift](https://github.com/leolee3914/real_lift)
+
 # Installation
 
 1. Download `.jar` plugin from the [release page](https://github.com/leolee3914/real_lift_java/releases).
