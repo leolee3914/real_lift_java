@@ -1,6 +1,5 @@
 package leolee3914.real_lift;
 
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.*;
@@ -410,7 +409,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 		Material blockId = b.getType();
 		if ( blockId == Material.GOLD_BLOCK ) {
 			Location liftPos = bPos.clone();
-			if ( bPos.y() < p.getLocation().y() ) {
+			if ( bPos.getY() < p.getLocation().getY() ) {
 				liftPos.add(0, 5, 0);
 			}
 			if ( isLiftColumn(world, liftPos.getBlockX(), liftPos.getBlockY(), liftPos.getBlockZ()) ) {
@@ -515,7 +514,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 							return;
 						}
 					}
-					Movement movement = ((bPos.y() > p.getLocation().y()) ? Movement.UP : Movement.DOWN);
+					Movement movement = ((bPos.getY() > p.getLocation().getY()) ? Movement.UP : Movement.DOWN);
 					movingLift.put(hash, new MovingLift(
 							liftPos.clone(),
 							movement,
@@ -578,7 +577,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 
 			@Nullable Integer targetY = chestMenuData.invIndexToTargetYMap.get(slot);
 			if ( targetY == null ) {
-				p.playSound(net.kyori.adventure.sound.Sound.sound(Key.key("entity.item.break"), net.kyori.adventure.sound.Sound.Source.MASTER, 1f, 0.6f));
+				p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 0.6f);
 				return;
 			}
 
@@ -605,7 +604,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 					getLiftSizeByPosition(world, liftPos.getBlockX(), liftPos.getBlockY(), liftPos.getBlockZ()),
 					chestMenuData.fastMode
 				));
-				p.playSound(net.kyori.adventure.sound.Sound.sound(Key.key("block.note_block.pling"), net.kyori.adventure.sound.Sound.Source.MASTER, 1f, 2f));
+				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
 			} else {
 				p.sendMessage("§c!!! 你不在該升降機中或升降機已經移動 !!!");
 			}
@@ -671,7 +670,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 			return;
 		}
 
-		Location pos = lift.position.toBlockLocation();
+		Location pos = lift.position;
 		HashMap<UUID, Entity> insideEntities = new HashMap<>();
 		int offset = switch ( lift.liftSize ) {
 			case LiftSize.SIZE_5 -> 2;
@@ -679,12 +678,12 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 			default -> 0;
 		};
 		var bb = new BoundingBox(
-			pos.x() - offset,
-			pos.y() - 6.5,
-			pos.z() - offset,
-			pos.x() + offset + 1,
-			pos.y(),
-			pos.z() + offset + 1
+			pos.getBlockX() - offset,
+			pos.getBlockY() - 6.5,
+			pos.getBlockZ() - offset,
+			pos.getBlockX() + offset + 1,
+			pos.getBlockY(),
+			pos.getBlockZ() + offset + 1
 		);
 		for ( Entity entity : world.getNearbyEntities(bb) ) {
 			if ( entity instanceof Player player ) {
