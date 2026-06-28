@@ -22,7 +22,7 @@ public class Locale {
 	public final static String STOPPED_LIFT = "stopped-lift";
 	public final static String LIFT_ARRIVED = "lift-arrived";
 
-	private static HashMap<String, String> data = new HashMap<>(Map.of());
+	private static HashMap<String, String> data = new HashMap<>();
 
 	public static String get ( String key ) {
 		@Nullable String value = data.get(key);
