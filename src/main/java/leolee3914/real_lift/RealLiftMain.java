@@ -9,6 +9,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Lightable;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -30,12 +31,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.*;
 
 public final class RealLiftMain extends JavaPlugin implements Listener {
-
-	public final static String CHEST_MENU_NORMAL_TITLE = "升降機";
-	public final static String CHEST_MENU_FAST_TITLE = CHEST_MENU_NORMAL_TITLE + " (快速模式)";
 
 	public enum Movement {
 		UP, DOWN, STOP,
@@ -93,6 +92,13 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 		enable3x3 = getConfig().getBoolean("enable3x3");
 		enable5x5 = getConfig().getBoolean("enable5x5");
 		tp_entity = getConfig().getBoolean("tp_entity");
+
+		saveResource("locale.yml", false);
+		saveResource("locale-eng.yml", false);
+		saveResource("locale-zh-TW.yml", false);
+
+		YamlConfiguration locale = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "locale.yml"));
+		Locale.setData(locale);
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, this::moveLift, 0, 1);
 	}
@@ -436,7 +442,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 									for ( Side face : Arrays.asList(Side.FRONT, Side.BACK) ) {
 										SignSide signSide = signBlockState.getSide(face);
 										if ( PlainTextComponentSerializer.plainText().serialize(signSide.line(0)).equalsIgnoreCase("[lift]") ) {
-											String floorText = "§e" + PlainTextComponentSerializer.plainText().serialize(signSide.line(1)) + "§r§e" + " (高度:" + (y - 4) + ")";
+											String floorText = "§e" + PlainTextComponentSerializer.plainText().serialize(signSide.line(1)) + "§r§e" + " (" + Locale.get(Locale.HEIGHT) + ":" + (y - 4) + ")";
 
 											if ( y > liftPosY ) {
 												floorDataListUp.add(new FloorDataArray(floorText, y));
@@ -467,10 +473,10 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 							HashMap<Integer, Integer> invIndexToTargetYMap = new HashMap<>();
 
 							p.closeInventory();
-							Inventory inv = getServer().createInventory(null, 54, Component.text(fastMode ? CHEST_MENU_FAST_TITLE : CHEST_MENU_NORMAL_TITLE));
+							Inventory inv = getServer().createInventory(null, 54, Component.text(Locale.get(fastMode ? Locale.MENU_TITLE_LIFT_FAST_MODE : Locale.MENU_TITLE_LIFT)));
 
 							if ( currentHeightFloorName != null ) {
-								inv.setItem(CHEST_MENU_ITEM_CENTER_INDEX, getItem(Material.REDSTONE, 1, currentHeightFloorName + " §c[* 目前高度 *]"));
+								inv.setItem(CHEST_MENU_ITEM_CENTER_INDEX, getItem(Material.REDSTONE, 1, currentHeightFloorName + " §c[* " + Locale.get(Locale.CURRENT_HEIGHT) + " *]"));
 							}
 
 							int floorDataListUpLastIndex = Math.min(CHEST_MENU_ITEM_PATH_UP_INDEX_LIST.length, floorDataListUp.size() + 1 + (currentHeightFloorName == null ? 0 : 1)) - 1;
@@ -484,7 +490,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 									inv.setItem(invIndex, getItem(Material.OAK_SIGN, 1, floorDataArray.floorName));
 								} else {
 									invIndexToTargetYMap.put(invIndex, worldMaxY - 1);
-									inv.setItem(invIndex, getItem(Material.SEA_LANTERN, 1, "§c最高層 §e" + " (高度:" + (worldMaxY - 5) + ")"));
+									inv.setItem(invIndex, getItem(Material.SEA_LANTERN, 1, "§c" + Locale.get(Locale.HIGHEST) + " §e" + " (" + Locale.get(Locale.HEIGHT) + ":" + (worldMaxY - 5) + ")"));
 								}
 							}
 
@@ -499,7 +505,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 									inv.setItem(invIndex, getItem(Material.OAK_SIGN, 1, floorDataArray.floorName));
 								} else {
 									invIndexToTargetYMap.put(invIndex, liftMinY);
-									inv.setItem(invIndex, getItem(Material.SEA_LANTERN, 1, "§c最低層 §e" + " (高度:" + (worldMinY + 1) + ")"));
+									inv.setItem(invIndex, getItem(Material.SEA_LANTERN, 1, "§c" + Locale.get(Locale.LOWEST) + " §e" + " (" + Locale.get(Locale.HEIGHT) + ":" + (worldMinY + 1) + ")"));
 								}
 							}
 
@@ -516,22 +522,22 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 					}
 					Movement movement = ((bPos.getY() > p.getLocation().getY()) ? Movement.UP : Movement.DOWN);
 					movingLift.put(hash, new MovingLift(
-							liftPos.clone(),
-							movement,
-							null,
-							false,
-							false,
-							(movement == Movement.UP) ? world.getMaxHeight() - 1 : world.getMinHeight() + 5,
-							false,
-							getLiftSizeByPosition(world, liftPos.getBlockX(), liftPos.getBlockY(), liftPos.getBlockZ()),
-							false
+						liftPos.clone(),
+						movement,
+						null,
+						false,
+						false,
+						(movement == Movement.UP) ? world.getMaxHeight() - 1 : world.getMinHeight() + 5,
+						false,
+						getLiftSizeByPosition(world, liftPos.getBlockX(), liftPos.getBlockY(), liftPos.getBlockZ()),
+						false
 					));
 				} else if ( lift.waiting != null ) {
-					p.sendMessage("§e!!! 升降機稍作停留，請等候數秒鐘 !!!");
+					p.sendMessage("§e!!! " + Locale.get(Locale.LIFT_WAITING) + " !!!");
 				} else if ( lift.insideEntities.containsKey(p.getUniqueId()) ) {
 					lift.movement = Movement.STOP;
 					lift.waiting = 40;
-					p.sendMessage("§a> 已停止升降機");
+					p.sendMessage("§a> " + Locale.get(Locale.STOPPED_LIFT));
 				}
 			}
 		} else if ( blockId == Material.REDSTONE_LAMP ) {
@@ -606,7 +612,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 				));
 				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f);
 			} else {
-				p.sendMessage("§c!!! 你不在該升降機中或升降機已經移動 !!!");
+				p.sendMessage("§c!!! " + Locale.get(Locale.LIFT_MOVED) + " !!!");
 			}
 		}
 	}
@@ -629,7 +635,7 @@ public final class RealLiftMain extends JavaPlugin implements Listener {
 					if ( isLiftColumn(world, x, y, z) ) {
 						int targetY = blockY + 3;
 						if ( targetY == y ) {
-							p.sendMessage("§a> 升降機已經到達");
+							p.sendMessage("§a> " + Locale.get(Locale.LIFT_ARRIVED));
 							return true;
 						}
 						String hash = getLiftHash(world, x, z);
